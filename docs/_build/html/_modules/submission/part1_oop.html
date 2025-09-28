@@ -1,0 +1,537 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>submission.part1_oop &mdash; School Managment Database 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            School Managment Database
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">Project Modules (PyQt5 Path)</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">School Managment Database</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">submission.part1_oop</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for submission.part1_oop</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Core OOP models and utilities for a simple school management system.</span>
+
+<span class="sd">This module defines the domain objects (``Person``, ``Student``, ``Instructor``,</span>
+<span class="sd">``Course``) and helpers to validate input, serialize/deserialize data, and</span>
+<span class="sd">export reports to CSV and plain-text &quot;pretty&quot; tables.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">asdict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span><span class="o">,</span><span class="w"> </span><span class="nn">csv</span><span class="o">,</span><span class="w"> </span><span class="nn">re</span>
+
+
+<div class="viewcode-block" id="write_pretty_table">
+<a class="viewcode-back" href="../../modules.html#submission.part1_oop.write_pretty_table">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">write_pretty_table</span><span class="p">(</span><span class="n">headers</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">rows</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write a fixed-width plain-text table to a file.</span>
+
+<span class="sd">    Columns are sized to the widest value in each column so the result is easy</span>
+<span class="sd">    to read in any text editor. The parent directory is created if needed.</span>
+
+<span class="sd">    :param headers: Column headings, one per column.</span>
+<span class="sd">    :type headers: list[str]</span>
+<span class="sd">    :param rows: Table rows; each row is a list with the same length as ``headers``.</span>
+<span class="sd">    :type rows: list[list[Any]]</span>
+<span class="sd">    :param path: Destination file path for the generated table (``.txt`` recommended).</span>
+<span class="sd">    :type path: str</span>
+<span class="sd">    :return: None</span>
+<span class="sd">    :rtype: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+    <span class="n">widths</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">h</span><span class="p">)</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">headers</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">cell</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">r</span><span class="p">):</span>
+            <span class="n">widths</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">widths</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">cell</span><span class="p">)))</span>
+
+    <span class="n">sep</span> <span class="o">=</span> <span class="s2">&quot;  &quot;</span>
+    <span class="n">header_line</span> <span class="o">=</span> <span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">headers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">widths</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">headers</span><span class="p">)))</span>
+    <span class="n">divider</span> <span class="o">=</span> <span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="n">widths</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">headers</span><span class="p">)))</span>
+
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">header_line</span><span class="p">,</span> <span class="n">divider</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">widths</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">headers</span><span class="p">))))</span>
+
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">))</span></div>
+
+
+
+<span class="n">EMAIL_RE</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^[^@\s]+@[^@\s]+\.[^@\s]+$&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="is_valid_email">
+<a class="viewcode-back" href="../../modules.html#submission.part1_oop.is_valid_email">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_valid_email</span><span class="p">(</span><span class="n">email</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return ``True`` if the string looks like a valid email address.</span>
+
+<span class="sd">    A simple regex is used to catch the most common mistakes (missing ``@``,</span>
+<span class="sd">    spaces, no TLD, …). It is not meant to be 100% RFC-compliant.</span>
+
+<span class="sd">    :param email: Email address to check.</span>
+<span class="sd">    :type email: str</span>
+<span class="sd">    :return: ``True`` if the email matches ``EMAIL_RE``, otherwise ``False``.</span>
+<span class="sd">    :rtype: bool</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">EMAIL_RE</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">email</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="is_valid_age">
+<a class="viewcode-back" href="../../modules.html#submission.part1_oop.is_valid_age">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_valid_age</span><span class="p">(</span><span class="n">age</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return ``True`` if ``age`` can be parsed as a non-negative integer.</span>
+
+<span class="sd">    :param age: Age value or string representation (e.g., ``18`` or ``&quot;18&quot;``).</span>
+<span class="sd">    :type age: int | str</span>
+<span class="sd">    :return: ``True`` for ``age &gt;= 0``, otherwise ``False`` (including parse errors).</span>
+<span class="sd">    :rtype: bool</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">age</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+
+<div class="viewcode-block" id="Person">
+<a class="viewcode-back" href="../../modules.html#submission.part1_oop.Person">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Person</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for people in the system.</span>
+
+<span class="sd">    :param name: Person&#39;s full name.</span>
+<span class="sd">    :type name: str</span>
+<span class="sd">    :param age: Person&#39;s age (non-negative integer).</span>
+<span class="sd">    :type age: int</span>
+<span class="sd">    :param _email: Contact email (stored &quot;private&quot; by convention).</span>
+<span class="sd">    :type _email: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">age</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">_email</span><span class="p">:</span> <span class="nb">str</span>
+
+<div class="viewcode-block" id="Person.introduce">
+<a class="viewcode-back" href="../../modules.html#submission.part1_oop.Person.introduce">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">introduce</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a short self-introduction string.</span>
+
+<span class="sd">        :return: A sentence like ``&quot;Hi, I&#39;m Alice, 20 years old.&quot;``.</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Hi, I&#39;m </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">age</span><span class="si">}</span><span class="s2"> years old.&quot;</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Course">
+<a class="viewcode-back" href="../../modules.html#submission.part1_oop.Course">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Course</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A course offering with an optional instructor and enrolled students.</span>
+
+<span class="sd">    :param course_id: Unique identifier for the course (e.g., ``CS101``).</span>
+<span class="sd">    :type course_id: str</span>
+<span class="sd">    :param course_name: Human-readable course name (e.g., ``Intro to CS``).</span>
+<span class="sd">    :type course_name: str</span>
+<span class="sd">    :param instructor: The assigned instructor, if any.</span>
+<span class="sd">    :type instructor: Instructor | None</span>
+<span class="sd">    :param enrolled_students: Students currently enrolled in the course.</span>
+<span class="sd">    :type enrolled_students: list[Student]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">course_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">course_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">instructor</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;Instructor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">enrolled_students</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Student&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Course.add_student">
+<a class="viewcode-back" href="../../modules.html#submission.part1_oop.Course.add_student">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_student</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">student</span><span class="p">:</span> <span class="s2">&quot;Student&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Enroll a student in this course (idempotent).</span>
+
+<span class="sd">        If the student is already enrolled, nothing happens.</span>
+
+<span class="sd">        :param student: The student to enroll.</span>
+<span class="sd">        :type student: Student</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        :rtype: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">student</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">enrolled_students</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">enrolled_students</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">student</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Student">
+<a class="viewcode-back" href="../../modules.html#submission.part1_oop.Student">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Student</span><span class="p">(</span><span class="n">Person</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A student with an ID and a list of registered courses.</span>
+
+<span class="sd">    :param student_id: Unique student identifier.</span>
+<span class="sd">    :type student_id: str</span>
+<span class="sd">    :param registered_courses: Courses the student is registered in.</span>
+<span class="sd">    :type registered_courses: list[Course]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">student_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">registered_courses</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Course</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Student.register_course">
+<a class="viewcode-back" href="../../modules.html#submission.part1_oop.Student.register_course">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">register_course</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">course</span><span class="p">:</span> <span class="n">Course</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Register the student in a course and keep both sides in sync.</span>
+
+<span class="sd">        Adds the course to ``registered_courses`` and, if needed, calls</span>
+<span class="sd">        ``course.add_student(self)``.</span>
+
+<span class="sd">        :param course: Course to register for.</span>
+<span class="sd">        :type course: Course</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        :rtype: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">course</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">registered_courses</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">registered_courses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">course</span><span class="p">)</span>
+            <span class="n">course</span><span class="o">.</span><span class="n">add_student</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Instructor">
+<a class="viewcode-back" href="../../modules.html#submission.part1_oop.Instructor">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Instructor</span><span class="p">(</span><span class="n">Person</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;An instructor with an ID and assigned courses.</span>
+
+<span class="sd">    :param instructor_id: Unique instructor identifier.</span>
+<span class="sd">    :type instructor_id: str</span>
+<span class="sd">    :param assigned_courses: Courses this instructor teaches.</span>
+<span class="sd">    :type assigned_courses: list[Course]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">instructor_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">assigned_courses</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Course</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Instructor.assign_course">
+<a class="viewcode-back" href="../../modules.html#submission.part1_oop.Instructor.assign_course">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">assign_course</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">course</span><span class="p">:</span> <span class="n">Course</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Assign the instructor to a course and keep both sides in sync.</span>
+
+<span class="sd">        Adds the course to ``assigned_courses`` and sets ``course.instructor``.</span>
+
+<span class="sd">        :param course: Course to assign.</span>
+<span class="sd">        :type course: Course</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        :rtype: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">course</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">assigned_courses</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assigned_courses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">course</span><span class="p">)</span>
+            <span class="n">course</span><span class="o">.</span><span class="n">instructor</span> <span class="o">=</span> <span class="bp">self</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="to_json">
+<a class="viewcode-back" href="../../modules.html#submission.part1_oop.to_json">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">to_json</span><span class="p">(</span>
+    <span class="n">students</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Student</span><span class="p">],</span>
+    <span class="n">instructors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Instructor</span><span class="p">],</span>
+    <span class="n">courses</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Course</span><span class="p">],</span>
+    <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Serialize the current in-memory model to a JSON file.</span>
+
+<span class="sd">    Students and instructors are stored with their basic fields. Course</span>
+<span class="sd">    relationships are flattened to IDs to avoid recursion:</span>
+
+<span class="sd">    * Each student stores a list of **course IDs** (``registered_courses``).</span>
+<span class="sd">    * Each instructor stores a list of **course IDs** (``assigned_courses``).</span>
+<span class="sd">    * Each course stores its ``instructor_id`` (or ``null``) and a list of</span>
+<span class="sd">      enrolled **student IDs**.</span>
+
+<span class="sd">    :param students: All students to include in the export.</span>
+<span class="sd">    :type students: list[Student]</span>
+<span class="sd">    :param instructors: All instructors to include in the export.</span>
+<span class="sd">    :type instructors: list[Instructor]</span>
+<span class="sd">    :param courses: All courses to include in the export.</span>
+<span class="sd">    :type courses: list[Course]</span>
+<span class="sd">    :param path: Destination JSON file path.</span>
+<span class="sd">    :type path: str</span>
+<span class="sd">    :return: None</span>
+<span class="sd">    :rtype: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">person_dump</span><span class="p">(</span><span class="n">p</span><span class="p">:</span> <span class="n">Person</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert a ``Person`` (or subclass) to a serializable dictionary.</span>
+
+<span class="sd">        For students/instructors, course relationships are converted to ID lists.</span>
+
+<span class="sd">        :param p: Person instance to dump.</span>
+<span class="sd">        :type p: Person</span>
+<span class="sd">        :return: A JSON-serializable dict.</span>
+<span class="sd">        :rtype: dict[str, Any]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">asdict</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">Student</span><span class="p">):</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;registered_courses&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">course_id</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">p</span><span class="o">.</span><span class="n">registered_courses</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">Instructor</span><span class="p">):</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;assigned_courses&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">course_id</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">p</span><span class="o">.</span><span class="n">assigned_courses</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">d</span>
+
+    <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;students&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">person_dump</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">students</span><span class="p">],</span>
+        <span class="s2">&quot;instructors&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">person_dump</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">instructors</span><span class="p">],</span>
+        <span class="s2">&quot;courses&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;course_id&quot;</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">course_id</span><span class="p">,</span>
+                <span class="s2">&quot;course_name&quot;</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">course_name</span><span class="p">,</span>
+                <span class="s2">&quot;instructor_id&quot;</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">instructor</span><span class="o">.</span><span class="n">instructor_id</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">instructor</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="s2">&quot;enrolled_student_ids&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">student_id</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">enrolled_students</span><span class="p">],</span>
+            <span class="p">}</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">courses</span>
+        <span class="p">],</span>
+    <span class="p">}</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="from_json">
+<a class="viewcode-back" href="../../modules.html#submission.part1_oop.from_json">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">from_json</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load students, instructors, and courses from a JSON export.</span>
+
+<span class="sd">    This reconstructs objects and their relationships:</span>
+
+<span class="sd">    * Instructors are created first and mapped by ``instructor_id``.</span>
+<span class="sd">    * Students are created and mapped by ``student_id``.</span>
+<span class="sd">    * Courses are created, then linked to their instructor and enrolled students.</span>
+<span class="sd">    * Student ``registered_courses`` is synchronized from both directions</span>
+<span class="sd">      (student→course and course→student).</span>
+
+<span class="sd">    :param path: Path to a JSON file previously created by :func:`to_json`.</span>
+<span class="sd">    :type path: str</span>
+<span class="sd">    :return: A dict with keys ``&#39;students&#39;``, ``&#39;instructors&#39;``, ``&#39;courses&#39;``.</span>
+<span class="sd">    :rtype: dict[str, list]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+    <span class="n">instructors</span> <span class="o">=</span> <span class="p">[</span><span class="n">Instructor</span><span class="p">(</span><span class="o">**</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;instructors&quot;</span><span class="p">,</span> <span class="p">[])]</span>
+    <span class="n">inst_map</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">i</span><span class="p">[</span><span class="s2">&quot;instructor_id&quot;</span><span class="p">]:</span> <span class="nb">next</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">instructors</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">instructor_id</span> <span class="o">==</span> <span class="n">i</span><span class="p">[</span><span class="s2">&quot;instructor_id&quot;</span><span class="p">])</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;instructors&quot;</span><span class="p">,</span> <span class="p">[])</span>
+    <span class="p">}</span>
+
+    <span class="n">students</span> <span class="o">=</span> <span class="p">[</span><span class="n">Student</span><span class="p">(</span><span class="o">**</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;students&quot;</span><span class="p">,</span> <span class="p">[])]</span>
+    <span class="n">stud_map</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">s</span><span class="p">[</span><span class="s2">&quot;student_id&quot;</span><span class="p">]:</span> <span class="nb">next</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">students</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">student_id</span> <span class="o">==</span> <span class="n">s</span><span class="p">[</span><span class="s2">&quot;student_id&quot;</span><span class="p">])</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;students&quot;</span><span class="p">,</span> <span class="p">[])</span>
+    <span class="p">}</span>
+
+    <span class="n">courses</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Course</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;courses&quot;</span><span class="p">,</span> <span class="p">[]):</span>
+        <span class="n">course</span> <span class="o">=</span> <span class="n">Course</span><span class="p">(</span><span class="n">course_id</span><span class="o">=</span><span class="n">c</span><span class="p">[</span><span class="s2">&quot;course_id&quot;</span><span class="p">],</span> <span class="n">course_name</span><span class="o">=</span><span class="n">c</span><span class="p">[</span><span class="s2">&quot;course_name&quot;</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;instructor_id&quot;</span><span class="p">):</span>
+            <span class="n">course</span><span class="o">.</span><span class="n">instructor</span> <span class="o">=</span> <span class="n">inst_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s2">&quot;instructor_id&quot;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">course</span><span class="o">.</span><span class="n">instructor</span> <span class="ow">and</span> <span class="n">course</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">course</span><span class="o">.</span><span class="n">instructor</span><span class="o">.</span><span class="n">assigned_courses</span><span class="p">:</span>
+                <span class="n">course</span><span class="o">.</span><span class="n">instructor</span><span class="o">.</span><span class="n">assigned_courses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">course</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">sid</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;enrolled_student_ids&quot;</span><span class="p">,</span> <span class="p">[]):</span>
+            <span class="k">if</span> <span class="n">sid</span> <span class="ow">in</span> <span class="n">stud_map</span><span class="p">:</span>
+                <span class="n">course</span><span class="o">.</span><span class="n">add_student</span><span class="p">(</span><span class="n">stud_map</span><span class="p">[</span><span class="n">sid</span><span class="p">])</span>
+                <span class="n">stud_map</span><span class="p">[</span><span class="n">sid</span><span class="p">]</span><span class="o">.</span><span class="n">register_course</span><span class="p">(</span><span class="n">course</span><span class="p">)</span>
+
+        <span class="n">courses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">course</span><span class="p">)</span>
+
+    <span class="c1"># Ensure student.registered_courses is fully resolved even if only IDs were stored</span>
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">students</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">cid</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="n">cid</span> <span class="k">for</span> <span class="n">cid</span> <span class="ow">in</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s2">&quot;registered_courses&quot;</span><span class="p">,</span> <span class="p">[])</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cid</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="p">]:</span>
+            <span class="n">found</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">courses</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">course_id</span> <span class="o">==</span> <span class="n">cid</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">found</span> <span class="ow">and</span> <span class="n">found</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">registered_courses</span><span class="p">:</span>
+                <span class="n">s</span><span class="o">.</span><span class="n">register_course</span><span class="p">(</span><span class="n">found</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;students&quot;</span><span class="p">:</span> <span class="n">students</span><span class="p">,</span> <span class="s2">&quot;instructors&quot;</span><span class="p">:</span> <span class="n">instructors</span><span class="p">,</span> <span class="s2">&quot;courses&quot;</span><span class="p">:</span> <span class="n">courses</span><span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="export_csv">
+<a class="viewcode-back" href="../../modules.html#submission.part1_oop.export_csv">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">export_csv</span><span class="p">(</span>
+    <span class="n">students</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Student</span><span class="p">],</span>
+    <span class="n">instructors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Instructor</span><span class="p">],</span>
+    <span class="n">courses</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Course</span><span class="p">],</span>
+    <span class="n">folder</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Export students, instructors, and courses to CSV and pretty text files.</span>
+
+<span class="sd">    This creates three CSV files inside ``folder``:</span>
+
+<span class="sd">    * ``students.csv``  basic student info and a ``;``-separated list of course IDs.</span>
+<span class="sd">    * ``instructors.csv``  instructor info and assigned course IDs.</span>
+<span class="sd">    * ``courses.csv``  course details, instructor ID (or ``-``), and enrolled student IDs.</span>
+
+<span class="sd">    It also writes plain-text tables into ``folder/pretty_tables`` using</span>
+<span class="sd">    :func:`write_pretty_table` for quick inspection in a terminal.</span>
+
+<span class="sd">    :param students: Students to export.</span>
+<span class="sd">    :type students: list[Student]</span>
+<span class="sd">    :param instructors: Instructors to export.</span>
+<span class="sd">    :type instructors: list[Instructor]</span>
+<span class="sd">    :param courses: Courses to export.</span>
+<span class="sd">    :type courses: list[Course]</span>
+<span class="sd">    :param folder: Destination directory (created if it does not exist).</span>
+<span class="sd">    :type folder: str</span>
+<span class="sd">    :return: None</span>
+<span class="sd">    :rtype: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">csv</span>
+
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># students.csv</span>
+    <span class="n">rows_s</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">students</span><span class="p">:</span>
+        <span class="n">courses_str</span> <span class="o">=</span> <span class="s2">&quot;;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">course_id</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">registered_courses</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;-&quot;</span>
+        <span class="n">rows_s</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">s</span><span class="o">.</span><span class="n">student_id</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">age</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">_email</span><span class="p">,</span> <span class="n">courses_str</span><span class="p">])</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="s2">&quot;students.csv&quot;</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">w</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="s2">&quot;student_id&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="s2">&quot;email&quot;</span><span class="p">,</span> <span class="s2">&quot;courses&quot;</span><span class="p">])</span>
+        <span class="n">w</span><span class="o">.</span><span class="n">writerows</span><span class="p">(</span><span class="n">rows_s</span><span class="p">)</span>
+
+    <span class="c1"># instructors.csv</span>
+    <span class="n">rows_i</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">instructor_id</span><span class="p">,</span> <span class="n">i</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">i</span><span class="o">.</span><span class="n">age</span><span class="p">,</span> <span class="n">i</span><span class="o">.</span><span class="n">_email</span><span class="p">,</span> <span class="s2">&quot;;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">course_id</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">i</span><span class="o">.</span><span class="n">assigned_courses</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;-&quot;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">instructors</span>
+    <span class="p">]</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="s2">&quot;instructors.csv&quot;</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">w</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="s2">&quot;instructor_id&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="s2">&quot;email&quot;</span><span class="p">,</span> <span class="s2">&quot;assigned_courses&quot;</span><span class="p">])</span>
+        <span class="n">w</span><span class="o">.</span><span class="n">writerows</span><span class="p">(</span><span class="n">rows_i</span><span class="p">)</span>
+
+    <span class="c1"># courses.csv</span>
+    <span class="n">rows_c</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">courses</span><span class="p">:</span>
+        <span class="n">iid</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">instructor</span><span class="o">.</span><span class="n">instructor_id</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">instructor</span> <span class="k">else</span> <span class="s2">&quot;-&quot;</span>
+        <span class="n">students_str</span> <span class="o">=</span> <span class="s2">&quot;;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">student_id</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">enrolled_students</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;-&quot;</span>
+        <span class="n">rows_c</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">c</span><span class="o">.</span><span class="n">course_id</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">course_name</span><span class="p">,</span> <span class="n">iid</span><span class="p">,</span> <span class="n">students_str</span><span class="p">])</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="s2">&quot;courses.csv&quot;</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">w</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="s2">&quot;course_id&quot;</span><span class="p">,</span> <span class="s2">&quot;course_name&quot;</span><span class="p">,</span> <span class="s2">&quot;instructor_id&quot;</span><span class="p">,</span> <span class="s2">&quot;enrolled_student_ids&quot;</span><span class="p">])</span>
+        <span class="n">w</span><span class="o">.</span><span class="n">writerows</span><span class="p">(</span><span class="n">rows_c</span><span class="p">)</span>
+
+    <span class="c1"># Pretty text tables for quick viewing</span>
+    <span class="n">pretty_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="s2">&quot;pretty_tables&quot;</span><span class="p">)</span>
+    <span class="n">write_pretty_table</span><span class="p">(</span>
+        <span class="p">[</span><span class="s2">&quot;student_id&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="s2">&quot;email&quot;</span><span class="p">,</span> <span class="s2">&quot;courses&quot;</span><span class="p">],</span>
+        <span class="n">rows_s</span><span class="p">,</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pretty_dir</span><span class="p">,</span> <span class="s2">&quot;students_pretty.txt&quot;</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">write_pretty_table</span><span class="p">(</span>
+        <span class="p">[</span><span class="s2">&quot;instructor_id&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="s2">&quot;email&quot;</span><span class="p">,</span> <span class="s2">&quot;assigned_courses&quot;</span><span class="p">],</span>
+        <span class="n">rows_i</span><span class="p">,</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pretty_dir</span><span class="p">,</span> <span class="s2">&quot;instructors_pretty.txt&quot;</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">write_pretty_table</span><span class="p">(</span>
+        <span class="p">[</span><span class="s2">&quot;course_id&quot;</span><span class="p">,</span> <span class="s2">&quot;course_name&quot;</span><span class="p">,</span> <span class="s2">&quot;instructor_id&quot;</span><span class="p">,</span> <span class="s2">&quot;enrolled_student_ids&quot;</span><span class="p">],</span>
+        <span class="n">rows_c</span><span class="p">,</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pretty_dir</span><span class="p">,</span> <span class="s2">&quot;courses_pretty.txt&quot;</span><span class="p">),</span>
+    <span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Hassan Ali Fouani.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,807 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>submission.part3_pyqt5 &mdash; School Managment Database 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            School Managment Database
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">Project Modules (PyQt5 Path)</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">School Managment Database</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">submission.part3_pyqt5</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for submission.part3_pyqt5</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;PyQt5 GUI for a simple school management system.</span>
+
+<span class="sd">This module implements a desktop UI to manage students, instructors, and</span>
+<span class="sd">courses. It supports adding/updating/deleting records, assigning instructors,</span>
+<span class="sd">registering students into courses, simple search, and exporting data to JSON,</span>
+<span class="sd">CSV, and plain-text &quot;pretty&quot; tables.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span><span class="o">,</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">json</span><span class="o">,</span><span class="w"> </span><span class="nn">csv</span><span class="o">,</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PyQt5</span><span class="w"> </span><span class="kn">import</span> <span class="n">QtWidgets</span>
+
+
+<div class="viewcode-block" id="write_pretty_table">
+<a class="viewcode-back" href="../../modules.html#submission.part3_pyqt5.write_pretty_table">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">write_pretty_table</span><span class="p">(</span><span class="n">headers</span><span class="p">,</span> <span class="n">rows</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write a fixed-width plain-text table to ``path``.</span>
+
+<span class="sd">    Columns are sized to the widest value so the output lines up in any text</span>
+<span class="sd">    editor or terminal. The destination directory is created if needed.</span>
+
+<span class="sd">    :param headers: Column headings, one per column.</span>
+<span class="sd">    :type headers: list[str]</span>
+<span class="sd">    :param rows: Table rows; each row is a list of values matching ``headers`` length.</span>
+<span class="sd">    :type rows: list[list[object]]</span>
+<span class="sd">    :param path: Destination file path for the generated table (``.txt`` recommended).</span>
+<span class="sd">    :type path: str</span>
+<span class="sd">    :return: None</span>
+<span class="sd">    :rtype: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+    <span class="n">widths</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">h</span><span class="p">)</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">headers</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">cell</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">r</span><span class="p">):</span>
+            <span class="n">widths</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">widths</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">cell</span><span class="p">)))</span>
+    <span class="n">sep</span> <span class="o">=</span> <span class="s1">&#39;  &#39;</span>
+    <span class="n">header_line</span> <span class="o">=</span> <span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">headers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">:</span><span class="s1">&lt;</span><span class="si">{</span><span class="n">widths</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">headers</span><span class="p">))))</span>
+    <span class="n">divider</span> <span class="o">=</span> <span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="s1">&#39;-&#39;</span> <span class="o">*</span> <span class="n">widths</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">headers</span><span class="p">))))</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">header_line</span><span class="p">,</span> <span class="n">divider</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="si">:</span><span class="s1">&lt;</span><span class="si">{</span><span class="n">widths</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">headers</span><span class="p">)))))</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">))</span></div>
+
+
+
+<span class="n">EMAIL_RE</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;^[^@</span><span class="se">\\</span><span class="s1">s]+@[^@</span><span class="se">\\</span><span class="s1">s]+</span><span class="se">\\</span><span class="s1">.[^@</span><span class="se">\\</span><span class="s1">s]+$&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="is_valid_email">
+<a class="viewcode-back" href="../../modules.html#submission.part3_pyqt5.is_valid_email">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_valid_email</span><span class="p">(</span><span class="n">email</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return ``True`` if ``email`` looks valid.</span>
+
+<span class="sd">    A small regex is used to catch common mistakes (missing ``@``, spaces, etc.).</span>
+<span class="sd">    It is not intended to be fully RFC-compliant.</span>
+
+<span class="sd">    :param email: Email address to validate.</span>
+<span class="sd">    :type email: str</span>
+<span class="sd">    :return: ``True`` if the pattern matches, else ``False``.</span>
+<span class="sd">    :rtype: bool</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">EMAIL_RE</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">email</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="is_valid_age">
+<a class="viewcode-back" href="../../modules.html#submission.part3_pyqt5.is_valid_age">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_valid_age</span><span class="p">(</span><span class="n">age</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return ``True`` if ``age`` parses to a non-negative integer.</span>
+
+<span class="sd">    :param age: Age value as a string (e.g., ``&quot;18&quot;``).</span>
+<span class="sd">    :type age: str</span>
+<span class="sd">    :return: ``True`` for integers ``&gt;= 0``, else ``False``.</span>
+<span class="sd">    :rtype: bool</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">age</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+
+<span class="n">DATA</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;students&#39;</span><span class="p">:</span> <span class="p">{},</span> <span class="s1">&#39;instructors&#39;</span><span class="p">:</span> <span class="p">{},</span> <span class="s1">&#39;courses&#39;</span><span class="p">:</span> <span class="p">{}}</span>
+
+
+<div class="viewcode-block" id="Main">
+<a class="viewcode-back" href="../../modules.html#submission.part3_pyqt5.Main">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Main</span><span class="p">(</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QMainWindow</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Main application window with Students/Instructors/Courses tabs.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the main window and populate initial UI state.</span>
+
+<span class="sd">        Sets title/size, builds widgets and layouts, and refreshes all tables/</span>
+<span class="sd">        dropdowns to reflect the current in-memory ``DATA`` store.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="s1">&#39;School Management System&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="mi">1100</span><span class="p">,</span> <span class="mi">720</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_build</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refresh_all</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create all tabs, forms, tables, and wire up signals/slots.</span>
+
+<span class="sd">        This method constructs three tabs:</span>
+<span class="sd">        - **Students**: add/update/delete + search</span>
+<span class="sd">        - **Instructors**: add/update/delete + search</span>
+<span class="sd">        - **Courses**: add/update, assign instructor, register student, search,</span>
+<span class="sd">          export tools (JSON/CSV/&quot;pretty&quot; text)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tabs</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QTabWidget</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setCentralWidget</span><span class="p">(</span><span class="n">tabs</span><span class="p">)</span>
+
+        <span class="c1"># ---------------- Students tab ----------------</span>
+        <span class="n">ts</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QWidget</span><span class="p">()</span>
+        <span class="n">tabs</span><span class="o">.</span><span class="n">addTab</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="s1">&#39;Students&#39;</span><span class="p">)</span>
+        <span class="n">s_layout</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QVBoxLayout</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+
+        <span class="n">s_form</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QGroupBox</span><span class="p">(</span><span class="s1">&#39;Student Form&#39;</span><span class="p">)</span>
+        <span class="n">s_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">s_form</span><span class="p">)</span>
+        <span class="n">grid</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QGridLayout</span><span class="p">(</span><span class="n">s_form</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">s_id</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QLineEdit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s_id</span><span class="o">.</span><span class="n">setPlaceholderText</span><span class="p">(</span><span class="s1">&#39;ID&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s_name</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QLineEdit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s_name</span><span class="o">.</span><span class="n">setPlaceholderText</span><span class="p">(</span><span class="s1">&#39;Name&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s_age</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QLineEdit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s_age</span><span class="o">.</span><span class="n">setPlaceholderText</span><span class="p">(</span><span class="s1">&#39;Age (non-negative)&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s_email</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QLineEdit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s_email</span><span class="o">.</span><span class="n">setPlaceholderText</span><span class="p">(</span><span class="s1">&#39;Email (e.g., name@example.com)&#39;</span><span class="p">)</span>
+
+        <span class="n">grid</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;ID&#39;</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">grid</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">grid</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;Name&#39;</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">grid</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s_name</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">grid</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;Age&#39;</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">grid</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s_age</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">grid</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;Email&#39;</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">grid</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s_email</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+
+        <span class="n">add_s</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">(</span><span class="s1">&#39;Add/Update&#39;</span><span class="p">)</span>
+        <span class="n">add_s</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">add_student</span><span class="p">)</span>
+        <span class="n">del_s</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">(</span><span class="s1">&#39;Delete Selected&#39;</span><span class="p">)</span>
+        <span class="n">del_s</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">delete_selected</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s_table</span><span class="p">,</span> <span class="s1">&#39;student&#39;</span><span class="p">))</span>
+        <span class="n">grid</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">add_s</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">grid</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">del_s</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">s_search</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QLineEdit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s_search</span><span class="o">.</span><span class="n">setPlaceholderText</span><span class="p">(</span><span class="s1">&#39;Search by ID, name, email, course…&#39;</span><span class="p">)</span>
+        <span class="n">go_s</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">(</span><span class="s1">&#39;Go&#39;</span><span class="p">)</span>
+        <span class="n">go_s</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">refresh_students</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s_search</span><span class="o">.</span><span class="n">text</span><span class="p">()))</span>
+        <span class="n">grid</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;Search&#39;</span><span class="p">),</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">grid</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s_search</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">grid</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">go_s</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">s_table</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QTableWidget</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s_table</span><span class="o">.</span><span class="n">setHorizontalHeaderLabels</span><span class="p">([</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="s1">&#39;Name&#39;</span><span class="p">,</span> <span class="s1">&#39;Age&#39;</span><span class="p">,</span> <span class="s1">&#39;Email&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s_table</span><span class="o">.</span><span class="n">horizontalHeader</span><span class="p">()</span><span class="o">.</span><span class="n">setStretchLastSection</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">s_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s_table</span><span class="p">)</span>
+
+        <span class="c1"># ---------------- Instructors tab ----------------</span>
+        <span class="n">ti</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QWidget</span><span class="p">()</span>
+        <span class="n">tabs</span><span class="o">.</span><span class="n">addTab</span><span class="p">(</span><span class="n">ti</span><span class="p">,</span> <span class="s1">&#39;Instructors&#39;</span><span class="p">)</span>
+        <span class="n">i_layout</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QVBoxLayout</span><span class="p">(</span><span class="n">ti</span><span class="p">)</span>
+
+        <span class="n">i_form</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QGroupBox</span><span class="p">(</span><span class="s1">&#39;Instructor Form&#39;</span><span class="p">)</span>
+        <span class="n">i_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">i_form</span><span class="p">)</span>
+        <span class="n">grid2</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QGridLayout</span><span class="p">(</span><span class="n">i_form</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">i_id</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QLineEdit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i_id</span><span class="o">.</span><span class="n">setPlaceholderText</span><span class="p">(</span><span class="s1">&#39;ID&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i_name</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QLineEdit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i_name</span><span class="o">.</span><span class="n">setPlaceholderText</span><span class="p">(</span><span class="s1">&#39;Name&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i_age</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QLineEdit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i_age</span><span class="o">.</span><span class="n">setPlaceholderText</span><span class="p">(</span><span class="s1">&#39;Age (non-negative)&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i_email</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QLineEdit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i_email</span><span class="o">.</span><span class="n">setPlaceholderText</span><span class="p">(</span><span class="s1">&#39;Email (e.g., name@example.com)&#39;</span><span class="p">)</span>
+
+        <span class="n">grid2</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;ID&#39;</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">grid2</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">i_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">grid2</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;Name&#39;</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">grid2</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">i_name</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">grid2</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;Age&#39;</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">grid2</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">i_age</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">grid2</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;Email&#39;</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">grid2</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">i_email</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+
+        <span class="n">add_i</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">(</span><span class="s1">&#39;Add/Update&#39;</span><span class="p">)</span>
+        <span class="n">add_i</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">add_instructor</span><span class="p">)</span>
+        <span class="n">del_i</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">(</span><span class="s1">&#39;Delete Selected&#39;</span><span class="p">)</span>
+        <span class="n">del_i</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">delete_selected</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">i_table</span><span class="p">,</span> <span class="s1">&#39;instructor&#39;</span><span class="p">))</span>
+        <span class="n">grid2</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">add_i</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">grid2</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">del_i</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">i_search</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QLineEdit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i_search</span><span class="o">.</span><span class="n">setPlaceholderText</span><span class="p">(</span><span class="s1">&#39;Search by ID, name, email, course…&#39;</span><span class="p">)</span>
+        <span class="n">go_i</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">(</span><span class="s1">&#39;Go&#39;</span><span class="p">)</span>
+        <span class="n">go_i</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">refresh_instructors</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">i_search</span><span class="o">.</span><span class="n">text</span><span class="p">()))</span>
+        <span class="n">grid2</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;Search&#39;</span><span class="p">),</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">grid2</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">i_search</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">grid2</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">go_i</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">i_table</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QTableWidget</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i_table</span><span class="o">.</span><span class="n">setHorizontalHeaderLabels</span><span class="p">([</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="s1">&#39;Name&#39;</span><span class="p">,</span> <span class="s1">&#39;Age&#39;</span><span class="p">,</span> <span class="s1">&#39;Email&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i_table</span><span class="o">.</span><span class="n">horizontalHeader</span><span class="p">()</span><span class="o">.</span><span class="n">setStretchLastSection</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">i_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">i_table</span><span class="p">)</span>
+
+        <span class="c1"># ---------------- Courses tab ----------------</span>
+        <span class="n">tc</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QWidget</span><span class="p">()</span>
+        <span class="n">tabs</span><span class="o">.</span><span class="n">addTab</span><span class="p">(</span><span class="n">tc</span><span class="p">,</span> <span class="s1">&#39;Courses&#39;</span><span class="p">)</span>
+        <span class="n">c_layout</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QVBoxLayout</span><span class="p">(</span><span class="n">tc</span><span class="p">)</span>
+
+        <span class="n">c_form</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QGroupBox</span><span class="p">(</span><span class="s1">&#39;Course Form&#39;</span><span class="p">)</span>
+        <span class="n">c_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">c_form</span><span class="p">)</span>
+        <span class="n">grid3</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QGridLayout</span><span class="p">(</span><span class="n">c_form</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">c_id</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QLineEdit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c_id</span><span class="o">.</span><span class="n">setPlaceholderText</span><span class="p">(</span><span class="s1">&#39;Course ID&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c_name</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QLineEdit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c_name</span><span class="o">.</span><span class="n">setPlaceholderText</span><span class="p">(</span><span class="s1">&#39;Course Name&#39;</span><span class="p">)</span>
+
+        <span class="n">grid3</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;Course ID&#39;</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">grid3</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">grid3</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;Course Name&#39;</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">grid3</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c_name</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+
+        <span class="n">add_c</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">(</span><span class="s1">&#39;Add/Update&#39;</span><span class="p">)</span>
+        <span class="n">add_c</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">add_course</span><span class="p">)</span>
+        <span class="n">grid3</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">add_c</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+
+        <span class="n">assign</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QGroupBox</span><span class="p">(</span><span class="s1">&#39;Assignments &amp; Registrations&#39;</span><span class="p">)</span>
+        <span class="n">c_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">assign</span><span class="p">)</span>
+        <span class="n">grid4</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QGridLayout</span><span class="p">(</span><span class="n">assign</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">course_combo_assign</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QComboBox</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instructor_combo</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QComboBox</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">student_combo</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QComboBox</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">course_combo</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QComboBox</span><span class="p">()</span>
+
+        <span class="n">grid4</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;Course&#39;</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">grid4</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">course_combo_assign</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">grid4</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;Instructor&#39;</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">grid4</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instructor_combo</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">btn_assign</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">(</span><span class="s1">&#39;Assign Instructor&#39;</span><span class="p">)</span>
+        <span class="n">btn_assign</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assign_instructor</span><span class="p">)</span>
+        <span class="n">grid4</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">btn_assign</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+
+        <span class="n">grid4</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;Student&#39;</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">grid4</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">student_combo</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">grid4</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;Course&#39;</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">grid4</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">course_combo</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">btn_reg</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">(</span><span class="s1">&#39;Register Student&#39;</span><span class="p">)</span>
+        <span class="n">btn_reg</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">register_student</span><span class="p">)</span>
+        <span class="n">grid4</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">btn_reg</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+
+        <span class="n">tools</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="n">btn_save</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">(</span><span class="s1">&#39;Save JSON&#39;</span><span class="p">)</span>
+        <span class="n">btn_save</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_json</span><span class="p">)</span>
+        <span class="n">btn_load</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">(</span><span class="s1">&#39;Load JSON&#39;</span><span class="p">)</span>
+        <span class="n">btn_load</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">load_json</span><span class="p">)</span>
+        <span class="n">btn_csv</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">(</span><span class="s1">&#39;Export CSVs&#39;</span><span class="p">)</span>
+        <span class="n">btn_csv</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">export_csvs</span><span class="p">)</span>
+        <span class="n">tools</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">btn_save</span><span class="p">)</span>
+        <span class="n">tools</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">btn_load</span><span class="p">)</span>
+        <span class="n">tools</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">btn_csv</span><span class="p">)</span>
+        <span class="n">c_layout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">tools</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">c_search</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QLineEdit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c_search</span><span class="o">.</span><span class="n">setPlaceholderText</span><span class="p">(</span><span class="s1">&#39;Search by course id, name, instructor…&#39;</span><span class="p">)</span>
+        <span class="n">go_c</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">(</span><span class="s1">&#39;Go&#39;</span><span class="p">)</span>
+        <span class="n">go_c</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">refresh_courses</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c_search</span><span class="o">.</span><span class="n">text</span><span class="p">()))</span>
+        <span class="n">sr</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="n">sr</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;Search&#39;</span><span class="p">))</span>
+        <span class="n">sr</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c_search</span><span class="p">)</span>
+        <span class="n">sr</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">go_c</span><span class="p">)</span>
+        <span class="n">c_layout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">sr</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">c_table</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QTableWidget</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c_table</span><span class="o">.</span><span class="n">setHorizontalHeaderLabels</span><span class="p">([</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="s1">&#39;Name&#39;</span><span class="p">,</span> <span class="s1">&#39;InstructorID&#39;</span><span class="p">,</span> <span class="s1">&#39;InstructorName&#39;</span><span class="p">,</span> <span class="s1">&#39;Students&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c_table</span><span class="o">.</span><span class="n">horizontalHeader</span><span class="p">()</span><span class="o">.</span><span class="n">setStretchLastSection</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">c_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c_table</span><span class="p">)</span>
+
+        <span class="n">del_c</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">(</span><span class="s1">&#39;Delete Selected Course&#39;</span><span class="p">)</span>
+        <span class="n">del_c</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">delete_selected</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c_table</span><span class="p">,</span> <span class="s1">&#39;course&#39;</span><span class="p">))</span>
+        <span class="n">c_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">del_c</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Main.refresh_all">
+<a class="viewcode-back" href="../../modules.html#submission.part3_pyqt5.Main.refresh_all">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">refresh_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Refresh all tables and dropdowns from the in-memory data store.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refresh_students</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refresh_instructors</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refresh_courses</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refresh_dropdowns</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Main.refresh_students">
+<a class="viewcode-back" href="../../modules.html#submission.part3_pyqt5.Main.refresh_students">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">refresh_students</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Populate the Students table, optionally filtered by a query.</span>
+
+<span class="sd">        The search is case-insensitive and checks ID, name, email, and the</span>
+<span class="sd">        student&#39;s course IDs/names.</span>
+
+<span class="sd">        :param q: Free-text query to filter rows. Empty string shows all.</span>
+<span class="sd">        :type q: str</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        :rtype: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fill_table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s_table</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="p">(</span><span class="n">q</span> <span class="ow">or</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">sid</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">DATA</span><span class="p">[</span><span class="s1">&#39;students&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">course_bits</span> <span class="o">=</span> <span class="n">_student_course_tokens</span><span class="p">(</span><span class="n">sid</span><span class="p">)</span>
+            <span class="n">hay</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">sid</span><span class="p">,</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">],</span> <span class="o">*</span><span class="n">course_bits</span><span class="p">])</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">q</span> <span class="ow">and</span> <span class="n">q</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">hay</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">sid</span><span class="p">,</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">],</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fill_table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s_table</span><span class="p">,</span> <span class="n">rows</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Main.refresh_instructors">
+<a class="viewcode-back" href="../../modules.html#submission.part3_pyqt5.Main.refresh_instructors">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">refresh_instructors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Populate the Instructors table, optionally filtered by a query.</span>
+
+<span class="sd">        The search is case-insensitive and checks ID, name, email, and the</span>
+<span class="sd">        instructor&#39;s assigned course IDs/names.</span>
+
+<span class="sd">        :param q: Free-text query to filter rows. Empty string shows all.</span>
+<span class="sd">        :type q: str</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        :rtype: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fill_table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">i_table</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="p">(</span><span class="n">q</span> <span class="ow">or</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">iid</span><span class="p">,</span> <span class="n">ins</span> <span class="ow">in</span> <span class="n">DATA</span><span class="p">[</span><span class="s1">&#39;instructors&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">course_bits</span> <span class="o">=</span> <span class="n">_instructor_course_tokens</span><span class="p">(</span><span class="n">iid</span><span class="p">)</span>
+            <span class="n">hay</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">iid</span><span class="p">,</span> <span class="n">ins</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">ins</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">],</span> <span class="o">*</span><span class="n">course_bits</span><span class="p">])</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">q</span> <span class="ow">and</span> <span class="n">q</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">hay</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">iid</span><span class="p">,</span> <span class="n">ins</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">ins</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">],</span> <span class="n">ins</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fill_table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">i_table</span><span class="p">,</span> <span class="n">rows</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Main.refresh_courses">
+<a class="viewcode-back" href="../../modules.html#submission.part3_pyqt5.Main.refresh_courses">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">refresh_courses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Populate the Courses table, optionally filtered by a query.</span>
+
+<span class="sd">        The search is case-insensitive and checks course ID, name, and assigned</span>
+<span class="sd">        instructor ID.</span>
+
+<span class="sd">        :param q: Free-text query to filter rows. Empty string shows all.</span>
+<span class="sd">        :type q: str</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        :rtype: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">inst_name</span><span class="p">(</span><span class="n">iid</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Return the instructor&#39;s name for an instructor ID.</span>
+
+<span class="sd">            :param iid: Instructor ID.</span>
+<span class="sd">            :type iid: str</span>
+<span class="sd">            :return: Instructor&#39;s display name or empty string if not found.</span>
+<span class="sd">            :rtype: str</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">return</span> <span class="n">DATA</span><span class="p">[</span><span class="s1">&#39;instructors&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">iid</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">cid</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">DATA</span><span class="p">[</span><span class="s1">&#39;courses&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">disp</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cid</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">c</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">c</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;instructor_id&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">if</span> <span class="n">q</span> <span class="ow">and</span> <span class="n">q</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">disp</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                <span class="k">continue</span>
+            <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">cid</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">c</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;instructor_id&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="n">inst_name</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;instructor_id&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)),</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;students&#39;</span><span class="p">,</span> <span class="p">[]))))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fill_table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c_table</span><span class="p">,</span> <span class="n">rows</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Main.refresh_dropdowns">
+<a class="viewcode-back" href="../../modules.html#submission.part3_pyqt5.Main.refresh_dropdowns">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">refresh_dropdowns</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Refresh all combo boxes (course, instructor, student pickers).&quot;&quot;&quot;</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">load_combo</span><span class="p">(</span><span class="n">combo</span><span class="p">,</span> <span class="n">items</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Replace the contents of a ``QComboBox`` with the given items.</span>
+
+<span class="sd">            :param combo: Combo box to update.</span>
+<span class="sd">            :type combo: QtWidgets.QComboBox</span>
+<span class="sd">            :param items: Items to insert (displayed as strings).</span>
+<span class="sd">            :type items: list[str]</span>
+<span class="sd">            :return: None</span>
+<span class="sd">            :rtype: None</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">combo</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+            <span class="n">combo</span><span class="o">.</span><span class="n">addItems</span><span class="p">(</span><span class="n">items</span><span class="p">)</span>
+        <span class="n">load_combo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">course_combo_assign</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">DATA</span><span class="p">[</span><span class="s1">&#39;courses&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="n">load_combo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instructor_combo</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">DATA</span><span class="p">[</span><span class="s1">&#39;instructors&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="n">load_combo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">student_combo</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">DATA</span><span class="p">[</span><span class="s1">&#39;students&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="n">load_combo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">course_combo</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">DATA</span><span class="p">[</span><span class="s1">&#39;courses&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_fill_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="n">rows</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Fill a ``QTableWidget`` with the provided rows.</span>
+
+<span class="sd">        :param table: Table to populate.</span>
+<span class="sd">        :type table: QtWidgets.QTableWidget</span>
+<span class="sd">        :param rows: Iterable of row tuples/lists to insert.</span>
+<span class="sd">        :type rows: list[list[object]] | list[tuple[object, ...]]</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        :rtype: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">table</span><span class="o">.</span><span class="n">setRowCount</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">rowCount</span><span class="p">()</span>
+            <span class="n">table</span><span class="o">.</span><span class="n">insertRow</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">r</span><span class="p">):</span>
+                <span class="n">table</span><span class="o">.</span><span class="n">setItem</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QTableWidgetItem</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_missing_fields_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pairs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a user-friendly message if any required fields are empty.</span>
+
+<span class="sd">        :param pairs: List of ``(Label, value)`` tuples to validate.</span>
+<span class="sd">        :type pairs: list[tuple[str, object]]</span>
+<span class="sd">        :return: ``None`` if all present, otherwise an error message string.</span>
+<span class="sd">        :rtype: str | None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">missing</span> <span class="o">=</span> <span class="p">[</span><span class="n">lbl</span> <span class="k">for</span> <span class="n">lbl</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">pairs</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span>
+        <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Missing data needed: &#39;</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="n">lbl</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">lbl</span> <span class="ow">in</span> <span class="n">missing</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">msg</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_email_error_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">email</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return an email validation message or ``None`` if valid.</span>
+
+<span class="sd">        :param email: Email address to check.</span>
+<span class="sd">        :type email: str</span>
+<span class="sd">        :return: ``&#39;Email is not written correctly.&#39;`` if invalid, else ``None``.</span>
+<span class="sd">        :rtype: str | None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">email</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">is_valid_email</span><span class="p">(</span><span class="n">email</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="s1">&#39;Email is not written correctly.&#39;</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Main.add_student">
+<a class="viewcode-back" href="../../modules.html#submission.part3_pyqt5.Main.add_student">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_student</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add or update a student from the form fields.</span>
+
+<span class="sd">        Performs required-field checks, email validation, and non-negative age</span>
+<span class="sd">        validation. Updates the in-memory ``DATA`` store and refreshes the UI.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">s_id</span><span class="o">.</span><span class="n">text</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">s_name</span><span class="o">.</span><span class="n">text</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">age</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">s_age</span><span class="o">.</span><span class="n">text</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">email</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">s_email</span><span class="o">.</span><span class="n">text</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+        <span class="n">missing_msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_missing_fields_message</span><span class="p">([(</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="n">sid</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;Name&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;Age&#39;</span><span class="p">,</span> <span class="n">age</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;Email&#39;</span><span class="p">,</span> <span class="n">email</span><span class="p">)])</span>
+        <span class="k">if</span> <span class="n">missing_msg</span><span class="p">:</span>
+            <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Validation&#39;</span><span class="p">,</span> <span class="n">missing_msg</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="n">email_msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_email_error_message</span><span class="p">(</span><span class="n">email</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">email_msg</span><span class="p">:</span>
+            <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Validation&#39;</span><span class="p">,</span> <span class="n">email_msg</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_valid_age</span><span class="p">(</span><span class="n">age</span><span class="p">):</span>
+            <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Validation&#39;</span><span class="p">,</span> <span class="s1">&#39;Age must be a non-negative integer.&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="n">DATA</span><span class="p">[</span><span class="s1">&#39;students&#39;</span><span class="p">][</span><span class="n">sid</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s1">&#39;age&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">age</span><span class="p">),</span> <span class="s1">&#39;email&#39;</span><span class="p">:</span> <span class="n">email</span><span class="p">,</span> <span class="s1">&#39;courses&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refresh_students</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refresh_dropdowns</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Main.add_instructor">
+<a class="viewcode-back" href="../../modules.html#submission.part3_pyqt5.Main.add_instructor">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_instructor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add or update an instructor from the form fields.</span>
+
+<span class="sd">        Performs required-field checks, email validation, and non-negative age</span>
+<span class="sd">        validation. Updates the in-memory ``DATA`` store and refreshes the UI.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">iid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">i_id</span><span class="o">.</span><span class="n">text</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">i_name</span><span class="o">.</span><span class="n">text</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">age</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">i_age</span><span class="o">.</span><span class="n">text</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">email</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">i_email</span><span class="o">.</span><span class="n">text</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+        <span class="n">missing_msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_missing_fields_message</span><span class="p">([(</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="n">iid</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;Name&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;Age&#39;</span><span class="p">,</span> <span class="n">age</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;Email&#39;</span><span class="p">,</span> <span class="n">email</span><span class="p">)])</span>
+        <span class="k">if</span> <span class="n">missing_msg</span><span class="p">:</span>
+            <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Validation&#39;</span><span class="p">,</span> <span class="n">missing_msg</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="n">email_msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_email_error_message</span><span class="p">(</span><span class="n">email</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">email_msg</span><span class="p">:</span>
+            <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Validation&#39;</span><span class="p">,</span> <span class="n">email_msg</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_valid_age</span><span class="p">(</span><span class="n">age</span><span class="p">):</span>
+            <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Validation&#39;</span><span class="p">,</span> <span class="s1">&#39;Age must be a non-negative integer.&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="n">DATA</span><span class="p">[</span><span class="s1">&#39;instructors&#39;</span><span class="p">][</span><span class="n">iid</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s1">&#39;age&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">age</span><span class="p">),</span> <span class="s1">&#39;email&#39;</span><span class="p">:</span> <span class="n">email</span><span class="p">,</span> <span class="s1">&#39;courses&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refresh_instructors</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refresh_dropdowns</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Main.add_course">
+<a class="viewcode-back" href="../../modules.html#submission.part3_pyqt5.Main.add_course">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_course</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add or update a course from the form fields.</span>
+
+<span class="sd">        Requires a course ID and name. Updates the in-memory ``DATA`` store and</span>
+<span class="sd">        refreshes the UI.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c_id</span><span class="o">.</span><span class="n">text</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c_name</span><span class="o">.</span><span class="n">text</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">missing_msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_missing_fields_message</span><span class="p">([(</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="n">cid</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;Name&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">)])</span>
+        <span class="k">if</span> <span class="n">missing_msg</span><span class="p">:</span>
+            <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Validation&#39;</span><span class="p">,</span> <span class="n">missing_msg</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="n">DATA</span><span class="p">[</span><span class="s1">&#39;courses&#39;</span><span class="p">][</span><span class="n">cid</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s1">&#39;instructor_id&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;students&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refresh_courses</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refresh_dropdowns</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Main.assign_instructor">
+<a class="viewcode-back" href="../../modules.html#submission.part3_pyqt5.Main.assign_instructor">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">assign_instructor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Assign the selected instructor to the selected course.&quot;&quot;&quot;</span>
+        <span class="n">cid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">course_combo_assign</span><span class="o">.</span><span class="n">currentText</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">iid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instructor_combo</span><span class="o">.</span><span class="n">currentText</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">cid</span><span class="p">:</span>
+            <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Validation&#39;</span><span class="p">,</span> <span class="s1">&#39;Select a course.&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">cid</span> <span class="ow">in</span> <span class="n">DATA</span><span class="p">[</span><span class="s1">&#39;courses&#39;</span><span class="p">]:</span>
+            <span class="n">DATA</span><span class="p">[</span><span class="s1">&#39;courses&#39;</span><span class="p">][</span><span class="n">cid</span><span class="p">][</span><span class="s1">&#39;instructor_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">iid</span> <span class="k">if</span> <span class="n">iid</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refresh_courses</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Main.register_student">
+<a class="viewcode-back" href="../../modules.html#submission.part3_pyqt5.Main.register_student">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">register_student</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Register the selected student into the selected course.</span>
+
+<span class="sd">        Keeps both sides in sync:</span>
+<span class="sd">        - Adds the student ID to the course&#39;s ``students`` list.</span>
+<span class="sd">        - Adds the course ID to the student&#39;s ``courses`` list.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">student_combo</span><span class="o">.</span><span class="n">currentText</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">cid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">course_combo</span><span class="o">.</span><span class="n">currentText</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">sid</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">cid</span><span class="p">:</span>
+            <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Validation&#39;</span><span class="p">,</span> <span class="s1">&#39;Select student and course.&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">sid</span> <span class="ow">in</span> <span class="n">DATA</span><span class="p">[</span><span class="s1">&#39;students&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">cid</span> <span class="ow">in</span> <span class="n">DATA</span><span class="p">[</span><span class="s1">&#39;courses&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">sid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">DATA</span><span class="p">[</span><span class="s1">&#39;courses&#39;</span><span class="p">][</span><span class="n">cid</span><span class="p">][</span><span class="s1">&#39;students&#39;</span><span class="p">]:</span>
+                <span class="n">DATA</span><span class="p">[</span><span class="s1">&#39;courses&#39;</span><span class="p">][</span><span class="n">cid</span><span class="p">][</span><span class="s1">&#39;students&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sid</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">cid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">DATA</span><span class="p">[</span><span class="s1">&#39;students&#39;</span><span class="p">][</span><span class="n">sid</span><span class="p">][</span><span class="s1">&#39;courses&#39;</span><span class="p">]:</span>
+                <span class="n">DATA</span><span class="p">[</span><span class="s1">&#39;students&#39;</span><span class="p">][</span><span class="n">sid</span><span class="p">][</span><span class="s1">&#39;courses&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cid</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refresh_courses</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Main.delete_selected">
+<a class="viewcode-back" href="../../modules.html#submission.part3_pyqt5.Main.delete_selected">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delete_selected</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="n">kind</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Delete the currently selected row of the given table.</span>
+
+<span class="sd">        Adjusts related data to keep the in-memory model consistent and then</span>
+<span class="sd">        refreshes the affected tables and dropdowns.</span>
+
+<span class="sd">        :param table: Source table (students, instructors, or courses table).</span>
+<span class="sd">        :type table: QtWidgets.QTableWidget</span>
+<span class="sd">        :param kind: One of ``&#39;student&#39;``, ``&#39;instructor&#39;``, or ``&#39;course&#39;``.</span>
+<span class="sd">        :type kind: str</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        :rtype: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">currentRow</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">row</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="s1">&#39;student&#39;</span><span class="p">:</span>
+            <span class="n">DATA</span><span class="p">[</span><span class="s1">&#39;students&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">DATA</span><span class="p">[</span><span class="s1">&#39;courses&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;students&#39;</span><span class="p">,</span> <span class="p">[]):</span>
+                    <span class="n">c</span><span class="p">[</span><span class="s1">&#39;students&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">refresh_students</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">refresh_courses</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">refresh_dropdowns</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">kind</span> <span class="o">==</span> <span class="s1">&#39;instructor&#39;</span><span class="p">:</span>
+            <span class="n">DATA</span><span class="p">[</span><span class="s1">&#39;instructors&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">DATA</span><span class="p">[</span><span class="s1">&#39;courses&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;instructor_id&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">key</span><span class="p">:</span>
+                    <span class="n">c</span><span class="p">[</span><span class="s1">&#39;instructor_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">refresh_instructors</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">refresh_courses</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">refresh_dropdowns</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">kind</span> <span class="o">==</span> <span class="s1">&#39;course&#39;</span><span class="p">:</span>
+            <span class="n">DATA</span><span class="p">[</span><span class="s1">&#39;courses&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">DATA</span><span class="p">[</span><span class="s1">&#39;students&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;courses&#39;</span><span class="p">,</span> <span class="p">[]):</span>
+                    <span class="n">s</span><span class="p">[</span><span class="s1">&#39;courses&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">refresh_courses</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">refresh_dropdowns</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Main.save_json">
+<a class="viewcode-back" href="../../modules.html#submission.part3_pyqt5.Main.save_json">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Save the in-memory ``DATA`` store to a JSON file chosen by the user.&quot;&quot;&quot;</span>
+        <span class="n">path</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getSaveFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Save JSON&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;JSON (*.json)&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">DATA</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">information</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Saved&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Saved to </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Main.load_json">
+<a class="viewcode-back" href="../../modules.html#submission.part3_pyqt5.Main.load_json">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load the ``DATA`` store from a JSON file chosen by the user.&quot;&quot;&quot;</span>
+        <span class="n">path</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getOpenFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Load JSON&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;JSON (*.json)&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">global</span> <span class="n">DATA</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">DATA</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refresh_all</span><span class="p">()</span>
+        <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">information</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Loaded&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Loaded from </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Main.export_csvs">
+<a class="viewcode-back" href="../../modules.html#submission.part3_pyqt5.Main.export_csvs">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">export_csvs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Export CSV files and pretty text tables to a folder.</span>
+
+<span class="sd">        Creates:</span>
+<span class="sd">        - ``students.csv`` with ID, name, age, email, courses</span>
+<span class="sd">        - ``instructors.csv`` with ID, name, age, email</span>
+<span class="sd">        - ``courses.csv`` with course ID, name, instructor ID, students</span>
+
+<span class="sd">        Also writes fixed-width text tables in ``pretty_tables`` for quick viewing.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">folder</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getExistingDirectory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Select Folder&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">folder</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Students CSV</span>
+        <span class="n">headers_s</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;student_id&#39;</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="s1">&#39;email&#39;</span><span class="p">,</span> <span class="s1">&#39;courses&#39;</span><span class="p">]</span>
+        <span class="n">rows_s</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">sid</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">DATA</span><span class="p">[</span><span class="s1">&#39;students&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">courses</span> <span class="o">=</span> <span class="s1">&#39;;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;courses&#39;</span><span class="p">,</span> <span class="p">[]))</span> <span class="ow">or</span> <span class="s1">&#39;-&#39;</span>
+            <span class="n">rows_s</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">sid</span><span class="p">,</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">],</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">],</span> <span class="n">courses</span><span class="p">])</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="s1">&#39;students.csv&#39;</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">w</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="n">w</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">headers_s</span><span class="p">)</span>
+            <span class="n">w</span><span class="o">.</span><span class="n">writerows</span><span class="p">(</span><span class="n">rows_s</span><span class="p">)</span>
+
+        <span class="c1"># Instructors CSV</span>
+        <span class="n">headers_i</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;instructor_id&#39;</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="s1">&#39;email&#39;</span><span class="p">]</span>
+        <span class="n">rows_i</span> <span class="o">=</span> <span class="p">[[</span><span class="n">iid</span><span class="p">,</span> <span class="n">i</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">i</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">],</span> <span class="n">i</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">]]</span> <span class="k">for</span> <span class="n">iid</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">DATA</span><span class="p">[</span><span class="s1">&#39;instructors&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="s1">&#39;instructors.csv&#39;</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">w</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="n">w</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">headers_i</span><span class="p">)</span>
+            <span class="n">w</span><span class="o">.</span><span class="n">writerows</span><span class="p">(</span><span class="n">rows_i</span><span class="p">)</span>
+
+        <span class="c1"># Courses CSV</span>
+        <span class="n">headers_c</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;course_id&#39;</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;instructor_id&#39;</span><span class="p">,</span> <span class="s1">&#39;students&#39;</span><span class="p">]</span>
+        <span class="n">rows_c</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">cid</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">DATA</span><span class="p">[</span><span class="s1">&#39;courses&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">students</span> <span class="o">=</span> <span class="s1">&#39;;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;students&#39;</span><span class="p">,</span> <span class="p">[]))</span> <span class="ow">or</span> <span class="s1">&#39;-&#39;</span>
+            <span class="n">iid</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;instructor_id&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="s1">&#39;-&#39;</span>
+            <span class="n">rows_c</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">cid</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">iid</span><span class="p">,</span> <span class="n">students</span><span class="p">])</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="s1">&#39;courses.csv&#39;</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">w</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="n">w</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">headers_c</span><span class="p">)</span>
+            <span class="n">w</span><span class="o">.</span><span class="n">writerows</span><span class="p">(</span><span class="n">rows_c</span><span class="p">)</span>
+
+        <span class="c1"># Pretty text tables</span>
+        <span class="n">pretty_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="s1">&#39;pretty_tables&#39;</span><span class="p">)</span>
+        <span class="n">write_pretty_table</span><span class="p">(</span><span class="n">headers_s</span><span class="p">,</span> <span class="n">rows_s</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pretty_dir</span><span class="p">,</span> <span class="s1">&#39;students_pretty.txt&#39;</span><span class="p">))</span>
+        <span class="n">write_pretty_table</span><span class="p">(</span><span class="n">headers_i</span><span class="p">,</span> <span class="n">rows_i</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pretty_dir</span><span class="p">,</span> <span class="s1">&#39;instructors_pretty.txt&#39;</span><span class="p">))</span>
+        <span class="n">write_pretty_table</span><span class="p">(</span><span class="n">headers_c</span><span class="p">,</span> <span class="n">rows_c</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pretty_dir</span><span class="p">,</span> <span class="s1">&#39;courses_pretty.txt&#39;</span><span class="p">))</span>
+        <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">information</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Export&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Files saved to </span><span class="si">{</span><span class="n">folder</span><span class="si">}</span><span class="s1"> (CSV + pretty_tables/*.txt)&#39;</span><span class="p">)</span></div>
+</div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_student_course_tokens</span><span class="p">(</span><span class="n">sid</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the student&#39;s course IDs + names (used for search matching).&quot;&quot;&quot;</span>
+    <span class="n">cids</span> <span class="o">=</span> <span class="n">DATA</span><span class="p">[</span><span class="s1">&#39;students&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;courses&#39;</span><span class="p">,</span> <span class="p">[])</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">DATA</span><span class="p">[</span><span class="s1">&#39;courses&#39;</span><span class="p">][</span><span class="n">cid</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">cid</span> <span class="ow">in</span> <span class="n">cids</span> <span class="k">if</span> <span class="n">cid</span> <span class="ow">in</span> <span class="n">DATA</span><span class="p">[</span><span class="s1">&#39;courses&#39;</span><span class="p">]]</span>
+    <span class="k">return</span> <span class="n">cids</span> <span class="o">+</span> <span class="n">names</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_instructor_course_tokens</span><span class="p">(</span><span class="n">iid</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the instructor&#39;s assigned course IDs + names (for search).&quot;&quot;&quot;</span>
+    <span class="n">cids</span> <span class="o">=</span> <span class="p">[</span><span class="n">cid</span> <span class="k">for</span> <span class="n">cid</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">DATA</span><span class="p">[</span><span class="s1">&#39;courses&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;instructor_id&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">iid</span><span class="p">]</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">DATA</span><span class="p">[</span><span class="s1">&#39;courses&#39;</span><span class="p">][</span><span class="n">cid</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">cid</span> <span class="ow">in</span> <span class="n">cids</span> <span class="k">if</span> <span class="n">cid</span> <span class="ow">in</span> <span class="n">DATA</span><span class="p">[</span><span class="s1">&#39;courses&#39;</span><span class="p">]]</span>
+    <span class="k">return</span> <span class="n">cids</span> <span class="o">+</span> <span class="n">names</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QApplication</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">Main</span><span class="p">()</span>
+    <span class="n">w</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">exec_</span><span class="p">())</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Hassan Ali Fouani.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
