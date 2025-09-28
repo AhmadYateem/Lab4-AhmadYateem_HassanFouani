@@ -1,0 +1,396 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>classes module &mdash; School Management System 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            School Management System
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">classes module</a><ul>
+<li><a class="reference internal" href="#classes.Course"><code class="docutils literal notranslate"><span class="pre">Course</span></code></a><ul>
+<li><a class="reference internal" href="#classes.Course.add_student"><code class="docutils literal notranslate"><span class="pre">Course.add_student()</span></code></a></li>
+<li><a class="reference internal" href="#classes.Course.from_dict"><code class="docutils literal notranslate"><span class="pre">Course.from_dict()</span></code></a></li>
+<li><a class="reference internal" href="#classes.Course.to_dict"><code class="docutils literal notranslate"><span class="pre">Course.to_dict()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#classes.Instructor"><code class="docutils literal notranslate"><span class="pre">Instructor</span></code></a><ul>
+<li><a class="reference internal" href="#classes.Instructor.assign_course"><code class="docutils literal notranslate"><span class="pre">Instructor.assign_course()</span></code></a></li>
+<li><a class="reference internal" href="#classes.Instructor.from_dict"><code class="docutils literal notranslate"><span class="pre">Instructor.from_dict()</span></code></a></li>
+<li><a class="reference internal" href="#classes.Instructor.to_dict"><code class="docutils literal notranslate"><span class="pre">Instructor.to_dict()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#classes.Person"><code class="docutils literal notranslate"><span class="pre">Person</span></code></a><ul>
+<li><a class="reference internal" href="#classes.Person.from_dict"><code class="docutils literal notranslate"><span class="pre">Person.from_dict()</span></code></a></li>
+<li><a class="reference internal" href="#classes.Person.to_dict"><code class="docutils literal notranslate"><span class="pre">Person.to_dict()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#classes.Student"><code class="docutils literal notranslate"><span class="pre">Student</span></code></a><ul>
+<li><a class="reference internal" href="#classes.Student.from_dict"><code class="docutils literal notranslate"><span class="pre">Student.from_dict()</span></code></a></li>
+<li><a class="reference internal" href="#classes.Student.register_course"><code class="docutils literal notranslate"><span class="pre">Student.register_course()</span></code></a></li>
+<li><a class="reference internal" href="#classes.Student.to_dict"><code class="docutils literal notranslate"><span class="pre">Student.to_dict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">School Management System</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">classes module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/classes.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-classes">
+<span id="classes-module"></span><h1>classes module<a class="headerlink" href="#module-classes" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="classes.Course">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">classes.</span></span><span class="sig-name descname"><span class="pre">Course</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">course_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">course_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instructor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enrolled_students</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/classes.html#Course"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#classes.Course" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Represents a course in the school management system.</p>
+<p>Courses can have an assigned instructor and maintain a list of
+enrolled students. Provides functionality for managing course
+enrollment and instructor assignments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>course_id</strong> (<em>str</em>) – Unique identifier for the course</p></li>
+<li><p><strong>course_name</strong> (<em>str</em>) – Name or title of the course</p></li>
+<li><p><strong>instructor</strong> (<a class="reference internal" href="#classes.Instructor" title="classes.Instructor"><em>Instructor</em></a><em> or </em><em>None</em>) – Instructor assigned to teach the course</p></li>
+<li><p><strong>enrolled_students</strong> (<em>list</em><em>, </em><em>optional</em>) – List of students enrolled in the course, defaults to None</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>AssertionError</strong> – If course_id is not a non-empty string</p></li>
+<li><p><strong>AssertionError</strong> – If course_name is not a non-empty string</p></li>
+<li><p><strong>AssertionError</strong> – If instructor is provided but not an Instructor object</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="classes.Course.add_student">
+<span class="sig-name descname"><span class="pre">add_student</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">student</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/classes.html#Course.add_student"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#classes.Course.add_student" title="Link to this definition"></a></dt>
+<dd><p>Adds a student to the course enrollment list.</p>
+<p>Enrolls the student in this course by adding them to the
+list of enrolled students. The student must be a valid Student object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>student</strong> (<a class="reference internal" href="#classes.Student" title="classes.Student"><em>Student</em></a>) – The student to enroll in the course</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>AssertionError</strong> – If student is not a valid Student object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="classes.Course.from_dict">
+<span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/classes.html#Course.from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#classes.Course.from_dict" title="Link to this definition"></a></dt>
+<dd><p>Updates course object attributes from dictionary data.</p>
+<p>Restores basic course information from dictionary. Student
+and instructor relationships must be rebuilt separately.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<em>dict</em>) – Dictionary containing course information</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="classes.Course.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/classes.html#Course.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#classes.Course.to_dict" title="Link to this definition"></a></dt>
+<dd><p>Converts course object to dictionary format for serialization.</p>
+<p>Creates a dictionary representation of the course with basic
+information for persistence purposes. Student and instructor
+relationships are handled separately.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary containing course ID and name</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="classes.Instructor">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">classes.</span></span><span class="sig-name descname"><span class="pre">Instructor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">age</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">email</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instructor_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assigned_courses</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/classes.html#Instructor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#classes.Instructor" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#classes.Person" title="classes.Person"><code class="xref py py-class docutils literal notranslate"><span class="pre">Person</span></code></a></p>
+<p>Represents an instructor in the school management system.</p>
+<p>Instructors can be assigned to teach multiple courses and maintain
+a list of their assigned courses. Inherits basic person attributes
+from Person class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – Full name of the instructor</p></li>
+<li><p><strong>age</strong> (<em>int</em>) – Age of the instructor in years</p></li>
+<li><p><strong>email</strong> (<em>str</em>) – Email address of the instructor</p></li>
+<li><p><strong>instructor_id</strong> (<em>str</em>) – Unique identifier for the instructor</p></li>
+<li><p><strong>assigned_courses</strong> (<em>list</em><em>, </em><em>optional</em>) – List of courses assigned to the instructor, defaults to None</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>AssertionError</strong> – If instructor_id is not a non-empty string</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="classes.Instructor.assign_course">
+<span class="sig-name descname"><span class="pre">assign_course</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">course</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/classes.html#Instructor.assign_course"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#classes.Instructor.assign_course" title="Link to this definition"></a></dt>
+<dd><p>Assigns a course to the instructor.</p>
+<p>Adds the course to the instructor’s list of assigned courses.
+The course must be a valid Course object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>course</strong> (<a class="reference internal" href="#classes.Course" title="classes.Course"><em>Course</em></a>) – The course to assign to the instructor</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>AssertionError</strong> – If course is not a valid Course object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="classes.Instructor.from_dict">
+<span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">courseDict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/classes.html#Instructor.from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#classes.Instructor.from_dict" title="Link to this definition"></a></dt>
+<dd><p>Updates instructor object attributes from dictionary data with course reconstruction.</p>
+<p>Restores instructor information from dictionary and rebuilds course
+relationships using the provided course dictionary lookup.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>dict</em>) – Dictionary containing instructor information</p></li>
+<li><p><strong>courseDict</strong> (<em>dict</em><em>, </em><em>optional</em>) – Dictionary mapping course IDs to Course objects, defaults to None</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="classes.Instructor.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/classes.html#Instructor.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#classes.Instructor.to_dict" title="Link to this definition"></a></dt>
+<dd><p>Converts instructor object to dictionary format for serialization.</p>
+<p>Creates a dictionary representation of the instructor including
+all assigned course IDs for persistence purposes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary containing instructor information and assigned course IDs</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="classes.Person">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">classes.</span></span><span class="sig-name descname"><span class="pre">Person</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">age</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">email</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/classes.html#Person"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#classes.Person" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Base class representing a person in the school management system.</p>
+<p>This class provides common attributes and functionality for all people
+in the system including students and instructors. It handles basic
+validation for name, age, and email format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – Full name of the person</p></li>
+<li><p><strong>age</strong> (<em>int</em>) – Age of the person in years</p></li>
+<li><p><strong>email</strong> (<em>str</em>) – Email address of the person</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>AssertionError</strong> – If name is not a string or is empty</p></li>
+<li><p><strong>AssertionError</strong> – If age is not an integer or is negative</p></li>
+<li><p><strong>AssertionError</strong> – If email is not a string or has invalid format</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="classes.Person.from_dict">
+<span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/classes.html#Person.from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#classes.Person.from_dict" title="Link to this definition"></a></dt>
+<dd><p>Updates person object attributes from dictionary data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<em>dict</em>) – Dictionary containing person information</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="classes.Person.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/classes.html#Person.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#classes.Person.to_dict" title="Link to this definition"></a></dt>
+<dd><p>Converts person object to dictionary format for serialization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary containing person’s basic information</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="classes.Student">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">classes.</span></span><span class="sig-name descname"><span class="pre">Student</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">age</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">email</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">student_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">registered_courses</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/classes.html#Student"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#classes.Student" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#classes.Person" title="classes.Person"><code class="xref py py-class docutils literal notranslate"><span class="pre">Person</span></code></a></p>
+<p>Represents a student in the school management system.</p>
+<p>Students can register for courses and maintain a list of their
+enrolled courses. Inherits basic person attributes from Person class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – Full name of the student</p></li>
+<li><p><strong>age</strong> (<em>int</em>) – Age of the student in years</p></li>
+<li><p><strong>email</strong> (<em>str</em>) – Email address of the student</p></li>
+<li><p><strong>student_id</strong> (<em>str</em>) – Unique identifier for the student</p></li>
+<li><p><strong>registered_courses</strong> (<em>list</em><em>, </em><em>optional</em>) – List of courses the student is registered for, defaults to None</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>AssertionError</strong> – If student_id is not a non-empty string</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="classes.Student.from_dict">
+<span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">courseDict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/classes.html#Student.from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#classes.Student.from_dict" title="Link to this definition"></a></dt>
+<dd><p>Updates student object attributes from dictionary data with course reconstruction.</p>
+<p>Restores student information from dictionary and rebuilds course
+relationships using the provided course dictionary lookup.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>dict</em>) – Dictionary containing student information</p></li>
+<li><p><strong>courseDict</strong> (<em>dict</em><em>, </em><em>optional</em>) – Dictionary mapping course IDs to Course objects, defaults to None</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="classes.Student.register_course">
+<span class="sig-name descname"><span class="pre">register_course</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">course</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/classes.html#Student.register_course"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#classes.Student.register_course" title="Link to this definition"></a></dt>
+<dd><p>Registers the student for a specific course.</p>
+<p>Adds the course to the student’s list of registered courses.
+The course must be a valid Course object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>course</strong> (<a class="reference internal" href="#classes.Course" title="classes.Course"><em>Course</em></a>) – The course to register for</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>AssertionError</strong> – If course is not a valid Course object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="classes.Student.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/classes.html#Student.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#classes.Student.to_dict" title="Link to this definition"></a></dt>
+<dd><p>Converts student object to dictionary format for serialization.</p>
+<p>Creates a dictionary representation of the student including
+all registered course IDs for persistence purposes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary containing student information and registered course IDs</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Ahmad Yateem.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

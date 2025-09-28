@@ -1,0 +1,464 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>classes &mdash; School Management System 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            School Management System
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">School Management System</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Module code</a></li>
+      <li class="breadcrumb-item active">classes</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for classes</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+
+<div class="viewcode-block" id="Person">
+<a class="viewcode-back" href="../classes.html#classes.Person">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Person</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class representing a person in the school management system.</span>
+<span class="sd">    </span>
+<span class="sd">    This class provides common attributes and functionality for all people</span>
+<span class="sd">    in the system including students and instructors. It handles basic</span>
+<span class="sd">    validation for name, age, and email format.</span>
+<span class="sd">    </span>
+<span class="sd">    :param name: Full name of the person</span>
+<span class="sd">    :type name: str</span>
+<span class="sd">    :param age: Age of the person in years</span>
+<span class="sd">    :type age: int</span>
+<span class="sd">    :param email: Email address of the person</span>
+<span class="sd">    :type email: str</span>
+<span class="sd">    :raises AssertionError: If name is not a string or is empty</span>
+<span class="sd">    :raises AssertionError: If age is not an integer or is negative</span>
+<span class="sd">    :raises AssertionError: If email is not a string or has invalid format</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">age</span><span class="p">,</span> <span class="n">email</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor method for Person class.</span>
+<span class="sd">        </span>
+<span class="sd">        :param name: Full name of the person</span>
+<span class="sd">        :type name: str</span>
+<span class="sd">        :param age: Age of the person in years</span>
+<span class="sd">        :type age: int</span>
+<span class="sd">        :param email: Email address of the person</span>
+<span class="sd">        :type email: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;Name must be a string&quot;</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">!=</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Name cannot be left empty&quot;</span>
+        <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">age</span><span class="p">)</span><span class="o">==</span> <span class="nb">int</span><span class="p">,</span> <span class="s2">&quot;Age must be an integer&quot;</span>
+        <span class="k">assert</span><span class="p">(</span><span class="n">age</span><span class="o">&gt;=</span><span class="mi">0</span><span class="p">),</span> <span class="s2">&quot;Age must be a positive value&quot;</span>
+        <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">email</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;Email must be a string&quot;</span>
+        <span class="k">assert</span> <span class="s2">&quot;@&quot;</span> <span class="ow">in</span> <span class="n">email</span> <span class="ow">and</span> <span class="n">email</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;@&quot;</span><span class="p">,</span> <span class="s2">&quot;Email must follow a valid format&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">age</span> <span class="o">=</span> <span class="n">age</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_email</span> <span class="o">=</span> <span class="n">email</span>
+    
+<div class="viewcode-block" id="Person.to_dict">
+<a class="viewcode-back" href="../classes.html#classes.Person.to_dict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts person object to dictionary format for serialization.</span>
+<span class="sd">        </span>
+<span class="sd">        :return: Dictionary containing person&#39;s basic information</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;age&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">age</span><span class="p">,</span> <span class="s2">&quot;email&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_email</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">d</span></div>
+
+    
+<div class="viewcode-block" id="Person.from_dict">
+<a class="viewcode-back" href="../classes.html#classes.Person.from_dict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Updates person object attributes from dictionary data.</span>
+<span class="sd">        </span>
+<span class="sd">        :param data: Dictionary containing person information</span>
+<span class="sd">        :type data: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">age</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;age&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_email</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;email&quot;</span><span class="p">]</span></div>
+</div>
+
+
+<div class="viewcode-block" id="Student">
+<a class="viewcode-back" href="../classes.html#classes.Student">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Student</span><span class="p">(</span><span class="n">Person</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents a student in the school management system.</span>
+<span class="sd">    </span>
+<span class="sd">    Students can register for courses and maintain a list of their</span>
+<span class="sd">    enrolled courses. Inherits basic person attributes from Person class.</span>
+<span class="sd">    </span>
+<span class="sd">    :param name: Full name of the student</span>
+<span class="sd">    :type name: str</span>
+<span class="sd">    :param age: Age of the student in years</span>
+<span class="sd">    :type age: int</span>
+<span class="sd">    :param email: Email address of the student</span>
+<span class="sd">    :type email: str</span>
+<span class="sd">    :param student_id: Unique identifier for the student</span>
+<span class="sd">    :type student_id: str</span>
+<span class="sd">    :param registered_courses: List of courses the student is registered for, defaults to None</span>
+<span class="sd">    :type registered_courses: list, optional</span>
+<span class="sd">    :raises AssertionError: If student_id is not a non-empty string</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">age</span><span class="p">,</span> <span class="n">email</span><span class="p">,</span> <span class="n">student_id</span><span class="p">,</span><span class="n">registered_courses</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor method for Student class.</span>
+<span class="sd">        </span>
+<span class="sd">        :param name: Full name of the student</span>
+<span class="sd">        :type name: str</span>
+<span class="sd">        :param age: Age of the student in years</span>
+<span class="sd">        :type age: int</span>
+<span class="sd">        :param email: Email address of the student</span>
+<span class="sd">        :type email: str</span>
+<span class="sd">        :param student_id: Unique identifier for the student</span>
+<span class="sd">        :type student_id: str</span>
+<span class="sd">        :param registered_courses: List of courses the student is registered for, defaults to None</span>
+<span class="sd">        :type registered_courses: list, optional</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">student_id</span><span class="p">)</span><span class="o">==</span><span class="nb">str</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">student_id</span><span class="p">)</span><span class="o">!=</span><span class="mi">0</span><span class="p">),</span> <span class="s2">&quot;Student id must be a non empty string&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="n">age</span><span class="p">,</span><span class="n">email</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">student_id</span> <span class="o">=</span> <span class="n">student_id</span>
+        <span class="k">if</span> <span class="n">registered_courses</span><span class="o">==</span><span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">registered_courses</span><span class="o">=</span><span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">registered_courses</span> <span class="o">=</span> <span class="n">registered_courses</span>
+    
+<div class="viewcode-block" id="Student.register_course">
+<a class="viewcode-back" href="../classes.html#classes.Student.register_course">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">register_course</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">course</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Registers the student for a specific course.</span>
+<span class="sd">        </span>
+<span class="sd">        Adds the course to the student&#39;s list of registered courses.</span>
+<span class="sd">        The course must be a valid Course object.</span>
+<span class="sd">        </span>
+<span class="sd">        :param course: The course to register for</span>
+<span class="sd">        :type course: Course</span>
+<span class="sd">        :raises AssertionError: If course is not a valid Course object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">course</span><span class="p">)</span><span class="o">==</span><span class="n">Course</span><span class="p">,</span> <span class="s2">&quot;Course must be valid&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">registered_courses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">course</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="Student.to_dict">
+<a class="viewcode-back" href="../classes.html#classes.Student.to_dict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts student object to dictionary format for serialization.</span>
+<span class="sd">        </span>
+<span class="sd">        Creates a dictionary representation of the student including</span>
+<span class="sd">        all registered course IDs for persistence purposes.</span>
+<span class="sd">        </span>
+<span class="sd">        :return: Dictionary containing student information and registered course IDs</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">course_ids</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">course</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">registered_courses</span><span class="p">:</span>
+             <span class="n">course_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">course</span><span class="o">.</span><span class="n">course_id</span><span class="p">)</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;age&quot;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">age</span><span class="p">,</span> <span class="s2">&quot;email&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_email</span><span class="p">,</span> <span class="s2">&quot;student_id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">student_id</span><span class="p">,</span> <span class="s2">&quot;registered_courses&quot;</span><span class="p">:</span> <span class="n">course_ids</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">d</span></div>
+
+    
+<div class="viewcode-block" id="Student.from_dict">
+<a class="viewcode-back" href="../classes.html#classes.Student.from_dict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="n">courseDict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Updates student object attributes from dictionary data with course reconstruction.</span>
+<span class="sd">        </span>
+<span class="sd">        Restores student information from dictionary and rebuilds course</span>
+<span class="sd">        relationships using the provided course dictionary lookup.</span>
+<span class="sd">        </span>
+<span class="sd">        :param data: Dictionary containing student information</span>
+<span class="sd">        :type data: dict</span>
+<span class="sd">        :param courseDict: Dictionary mapping course IDs to Course objects, defaults to None</span>
+<span class="sd">        :type courseDict: dict, optional</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">age</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;age&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_email</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;email&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">student_id</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;student_id&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">registered_courses</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">courseDict</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">course_ID</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;registered_courses&quot;</span><span class="p">]:</span>
+                 <span class="k">if</span> <span class="n">course_ID</span> <span class="ow">in</span> <span class="n">courseDict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">registered_courses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">courseDict</span><span class="p">[</span><span class="n">course_ID</span><span class="p">])</span></div>
+</div>
+
+
+<div class="viewcode-block" id="Instructor">
+<a class="viewcode-back" href="../classes.html#classes.Instructor">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Instructor</span><span class="p">(</span><span class="n">Person</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents an instructor in the school management system.</span>
+<span class="sd">    </span>
+<span class="sd">    Instructors can be assigned to teach multiple courses and maintain</span>
+<span class="sd">    a list of their assigned courses. Inherits basic person attributes</span>
+<span class="sd">    from Person class.</span>
+<span class="sd">    </span>
+<span class="sd">    :param name: Full name of the instructor</span>
+<span class="sd">    :type name: str</span>
+<span class="sd">    :param age: Age of the instructor in years</span>
+<span class="sd">    :type age: int</span>
+<span class="sd">    :param email: Email address of the instructor</span>
+<span class="sd">    :type email: str</span>
+<span class="sd">    :param instructor_id: Unique identifier for the instructor</span>
+<span class="sd">    :type instructor_id: str</span>
+<span class="sd">    :param assigned_courses: List of courses assigned to the instructor, defaults to None</span>
+<span class="sd">    :type assigned_courses: list, optional</span>
+<span class="sd">    :raises AssertionError: If instructor_id is not a non-empty string</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">age</span><span class="p">,</span> <span class="n">email</span><span class="p">,</span> <span class="n">instructor_id</span><span class="p">,</span><span class="n">assigned_courses</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor method for Instructor class.</span>
+<span class="sd">        </span>
+<span class="sd">        :param name: Full name of the instructor</span>
+<span class="sd">        :type name: str</span>
+<span class="sd">        :param age: Age of the instructor in years</span>
+<span class="sd">        :type age: int</span>
+<span class="sd">        :param email: Email address of the instructor</span>
+<span class="sd">        :type email: str</span>
+<span class="sd">        :param instructor_id: Unique identifier for the instructor</span>
+<span class="sd">        :type instructor_id: str</span>
+<span class="sd">        :param assigned_courses: List of courses assigned to the instructor, defaults to None</span>
+<span class="sd">        :type assigned_courses: list, optional</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">instructor_id</span><span class="p">)</span><span class="o">==</span><span class="nb">str</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">instructor_id</span><span class="p">)</span><span class="o">!=</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Instructor id must be a non empty string&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="n">age</span><span class="p">,</span><span class="n">email</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instructor_id</span> <span class="o">=</span> <span class="n">instructor_id</span>
+        <span class="k">if</span> <span class="n">assigned_courses</span><span class="o">==</span><span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assigned_courses</span><span class="o">=</span><span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>       
+            <span class="bp">self</span><span class="o">.</span><span class="n">assigned_courses</span> <span class="o">=</span> <span class="n">assigned_courses</span>
+    
+<div class="viewcode-block" id="Instructor.assign_course">
+<a class="viewcode-back" href="../classes.html#classes.Instructor.assign_course">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">assign_course</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">course</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Assigns a course to the instructor.</span>
+<span class="sd">        </span>
+<span class="sd">        Adds the course to the instructor&#39;s list of assigned courses.</span>
+<span class="sd">        The course must be a valid Course object.</span>
+<span class="sd">        </span>
+<span class="sd">        :param course: The course to assign to the instructor</span>
+<span class="sd">        :type course: Course</span>
+<span class="sd">        :raises AssertionError: If course is not a valid Course object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">course</span><span class="p">)</span><span class="o">==</span><span class="n">Course</span><span class="p">,</span> <span class="s2">&quot;Course must be valid&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assigned_courses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">course</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="Instructor.to_dict">
+<a class="viewcode-back" href="../classes.html#classes.Instructor.to_dict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts instructor object to dictionary format for serialization.</span>
+<span class="sd">        </span>
+<span class="sd">        Creates a dictionary representation of the instructor including</span>
+<span class="sd">        all assigned course IDs for persistence purposes.</span>
+<span class="sd">        </span>
+<span class="sd">        :return: Dictionary containing instructor information and assigned course IDs</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">course_ids</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">assigned_courses</span><span class="p">:</span>
+            <span class="n">course_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">course_id</span><span class="p">)</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;age&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">age</span><span class="p">,</span><span class="s2">&quot;email&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_email</span><span class="p">,</span> <span class="s2">&quot;instructor_id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">instructor_id</span><span class="p">,</span> <span class="s2">&quot;assigned_courses&quot;</span><span class="p">:</span> <span class="n">course_ids</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">d</span></div>
+
+    
+<div class="viewcode-block" id="Instructor.from_dict">
+<a class="viewcode-back" href="../classes.html#classes.Instructor.from_dict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="n">courseDict</span><span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Updates instructor object attributes from dictionary data with course reconstruction.</span>
+<span class="sd">        </span>
+<span class="sd">        Restores instructor information from dictionary and rebuilds course</span>
+<span class="sd">        relationships using the provided course dictionary lookup.</span>
+<span class="sd">        </span>
+<span class="sd">        :param data: Dictionary containing instructor information</span>
+<span class="sd">        :type data: dict</span>
+<span class="sd">        :param courseDict: Dictionary mapping course IDs to Course objects, defaults to None</span>
+<span class="sd">        :type courseDict: dict, optional</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">age</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;age&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_email</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;email&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instructor_id</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;instructor_id&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assigned_courses</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">courseDict</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+             <span class="k">for</span> <span class="n">courseId</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;assigned_courses&quot;</span><span class="p">]:</span>
+               <span class="k">if</span> <span class="n">courseId</span> <span class="ow">in</span> <span class="n">courseDict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">assigned_courses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">courseDict</span><span class="p">[</span><span class="n">courseId</span><span class="p">])</span></div>
+</div>
+
+
+<div class="viewcode-block" id="Course">
+<a class="viewcode-back" href="../classes.html#classes.Course">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Course</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents a course in the school management system.</span>
+<span class="sd">    </span>
+<span class="sd">    Courses can have an assigned instructor and maintain a list of</span>
+<span class="sd">    enrolled students. Provides functionality for managing course</span>
+<span class="sd">    enrollment and instructor assignments.</span>
+<span class="sd">    </span>
+<span class="sd">    :param course_id: Unique identifier for the course</span>
+<span class="sd">    :type course_id: str</span>
+<span class="sd">    :param course_name: Name or title of the course</span>
+<span class="sd">    :type course_name: str</span>
+<span class="sd">    :param instructor: Instructor assigned to teach the course</span>
+<span class="sd">    :type instructor: Instructor or None</span>
+<span class="sd">    :param enrolled_students: List of students enrolled in the course, defaults to None</span>
+<span class="sd">    :type enrolled_students: list, optional</span>
+<span class="sd">    :raises AssertionError: If course_id is not a non-empty string</span>
+<span class="sd">    :raises AssertionError: If course_name is not a non-empty string</span>
+<span class="sd">    :raises AssertionError: If instructor is provided but not an Instructor object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">course_id</span><span class="p">,</span><span class="n">course_name</span><span class="p">,</span><span class="n">instructor</span><span class="p">,</span><span class="n">enrolled_students</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor method for Course class.</span>
+<span class="sd">        </span>
+<span class="sd">        :param course_id: Unique identifier for the course</span>
+<span class="sd">        :type course_id: str</span>
+<span class="sd">        :param course_name: Name or title of the course</span>
+<span class="sd">        :type course_name: str</span>
+<span class="sd">        :param instructor: Instructor assigned to teach the course</span>
+<span class="sd">        :type instructor: Instructor or None</span>
+<span class="sd">        :param enrolled_students: List of students enrolled in the course, defaults to None</span>
+<span class="sd">        :type enrolled_students: list, optional</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">course_id</span><span class="p">)</span><span class="o">==</span> <span class="nb">str</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">course_id</span><span class="p">)</span><span class="o">!=</span><span class="mi">0</span><span class="p">),</span> <span class="s2">&quot;Course id must be a non empty string&quot;</span>
+        <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">course_name</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">course_name</span><span class="p">)</span><span class="o">!=</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Course name must be a non empty string&quot;</span>
+        <span class="k">if</span> <span class="n">instructor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">instructor</span><span class="p">)</span><span class="o">==</span><span class="n">Instructor</span><span class="p">,</span> <span class="s2">&quot;Instructor must actually be an instructor&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">course_id</span> <span class="o">=</span> <span class="n">course_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">course_name</span> <span class="o">=</span> <span class="n">course_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instructor</span> <span class="o">=</span> <span class="n">instructor</span>
+        <span class="k">if</span> <span class="n">enrolled_students</span><span class="o">==</span><span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">enrolled_students</span><span class="o">=</span><span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">enrolled_students</span><span class="o">=</span> <span class="n">enrolled_students</span>
+    
+<div class="viewcode-block" id="Course.add_student">
+<a class="viewcode-back" href="../classes.html#classes.Course.add_student">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_student</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">student</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds a student to the course enrollment list.</span>
+<span class="sd">        </span>
+<span class="sd">        Enrolls the student in this course by adding them to the</span>
+<span class="sd">        list of enrolled students. The student must be a valid Student object.</span>
+<span class="sd">        </span>
+<span class="sd">        :param student: The student to enroll in the course</span>
+<span class="sd">        :type student: Student</span>
+<span class="sd">        :raises AssertionError: If student is not a valid Student object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">student</span><span class="p">)</span><span class="o">==</span><span class="n">Student</span><span class="p">,</span> <span class="s2">&quot;Student must be a student&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enrolled_students</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">student</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="Course.to_dict">
+<a class="viewcode-back" href="../classes.html#classes.Course.to_dict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts course object to dictionary format for serialization.</span>
+<span class="sd">        </span>
+<span class="sd">        Creates a dictionary representation of the course with basic</span>
+<span class="sd">        information for persistence purposes. Student and instructor</span>
+<span class="sd">        relationships are handled separately.</span>
+<span class="sd">        </span>
+<span class="sd">        :return: Dictionary containing course ID and name</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;course_id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">course_id</span><span class="p">,</span> <span class="s2">&quot;course_name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">course_name</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">d</span></div>
+
+    
+<div class="viewcode-block" id="Course.from_dict">
+<a class="viewcode-back" href="../classes.html#classes.Course.from_dict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Updates course object attributes from dictionary data.</span>
+<span class="sd">        </span>
+<span class="sd">        Restores basic course information from dictionary. Student</span>
+<span class="sd">        and instructor relationships must be rebuilt separately.</span>
+<span class="sd">        </span>
+<span class="sd">        :param data: Dictionary containing course information</span>
+<span class="sd">        :type data: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">course_id</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;course_id&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">course_name</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;course_name&quot;</span><span class="p">]</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Ahmad Yateem.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
