@@ -319,3 +319,4 @@ class Course:
         """
         self.course_id = data["course_id"]
         self.course_name = data["course_name"]
+        
